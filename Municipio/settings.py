@@ -81,7 +81,11 @@ WSGI_APPLICATION = 'Municipio.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL')
+        default=os.environ.get(
+            'DATABASE_URL',
+            'postgresql://municipio_user:123456@localhost:5432/municipio_db'
+        ),
+        conn_max_age=600,
     )
 }
 
@@ -129,3 +133,12 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL  = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# ── Configuración de correo Gmail (SMTP) ──
+EMAIL_BACKEND       = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST          = 'smtp.gmail.com'
+EMAIL_PORT          = 587
+EMAIL_USE_TLS       = True
+EMAIL_HOST_USER     = 'yugchapilamunga34@gmail.com'
+EMAIL_HOST_PASSWORD = 'osio rkcv hxjy nxas'
+DEFAULT_FROM_EMAIL  = 'Municipio Digital <yugchapilamunga34@gmail.com>'
