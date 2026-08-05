@@ -1,0 +1,172 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="py-5" style="min-height:80vh; display:flex; align-items:center;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-6">
+
+        <div class="card border-0 shadow" style="border-radius:16px; overflow:hidden;">
+
+          <div class="card-header text-center py-4"
+               style="background:#0077b6; border:none;">
+            <i class="bi bi-person-plus fs-1 text-white"></i>
+            <h4 class="text-white mt-2 mb-0 fw-bold">Crear Cuenta</h4>
+            <p class="text-white-50 small mb-0">Municipio Digital — Atención Ciudadana</p>
+          </div>
+
+          <div class="card-body p-4">
+
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} py-2 small">
+                  <i class="bi bi-info-circle me-1"></i>{{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <form method="post" id="formRegistro">
+              {% csrf_token %}
+
+              <div class="row">
+                <!-- Usuario -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-semibold small">Usuario <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                      <i class="bi bi-at" style="color:#0077b6;"></i>
+                    </span>
+                    <input type="text" name="username" id="username"
+                           class="form-control border-start-0"
+                           placeholder="nombre_usuario"
+                           minlength="3" maxlength="50" required autofocus>
+                  </div>
+                </div>
+
+                <!-- Nombre completo -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-semibold small">Nombre completo <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                      <i class="bi bi-person" style="color:#0077b6;"></i>
+                    </span>
+                    <input type="text" name="nombre"
+                           class="form-control border-start-0"
+                           placeholder="Juan Pérez"
+                           minlength="3" maxlength="200" required>
+                  </div>
+                </div>
+
+                <!-- DNI -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-semibold small">DNI <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                      <i class="bi bi-card-text" style="color:#0077b6;"></i>
+                    </span>
+                    <input type="text" name="dni"
+                           class="form-control border-start-0"
+                           placeholder="12345678"
+                           maxlength="20" required>
+                  </div>
+                </div>
+
+                <!-- Teléfono -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-semibold small">Teléfono</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                      <i class="bi bi-telephone" style="color:#0077b6;"></i>
+                    </span>
+                    <input type="text" name="telefono"
+                           class="form-control border-start-0"
+                           placeholder="(011) 1234-5678"
+                           maxlength="20">
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="col-12 mb-3">
+                  <label class="form-label fw-semibold small">Correo electrónico</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                      <i class="bi bi-envelope" style="color:#0077b6;"></i>
+                    </span>
+                    <input type="email" name="email"
+                           class="form-control border-start-0"
+                           placeholder="tucorreo@ejemplo.com">
+                  </div>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-semibold small">Contraseña <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                      <i class="bi bi-lock" style="color:#0077b6;"></i>
+                    </span>
+                    <input type="password" name="password" id="pass1"
+                           class="form-control border-start-0"
+                           placeholder="Mínimo 6 caracteres"
+                           minlength="6" required>
+                  </div>
+                </div>
+
+                <!-- Confirmar contraseña -->
+                <div class="col-md-6 mb-4">
+                  <label class="form-label fw-semibold small">Confirmar Contraseña <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                      <i class="bi bi-lock-fill" style="color:#0077b6;"></i>
+                    </span>
+                    <input type="password" name="password2" id="pass2"
+                           class="form-control border-start-0"
+                           placeholder="Repetí la contraseña"
+                           minlength="6" required>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn w-100 text-white fw-semibold"
+                      style="background:#0077b6;">
+                <i class="bi bi-person-check me-2"></i>Registrarme
+              </button>
+            </form>
+
+            <hr class="my-3">
+            <p class="text-center small text-muted mb-0">
+              ¿Ya tenés cuenta?
+              <a href="/login/" class="fw-semibold" style="color:#f0a500;">Iniciar Sesión</a>
+            </p>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $('#formRegistro').validate({
+    rules: {
+      username:  { required: true, minlength: 3 },
+      nombre:    { required: true, minlength: 3, soloLetras: true, noRepetido: true },
+      dni:       { required: true, soloNumeros: true, cedulaEcuador: true },
+      email:     { email: true },
+      telefono:  { telefonoEcuador: true },
+      password:  { required: true, minlength: 6 },
+      password2: { required: true, equalTo: '#pass1' }
+    },
+    messages: {
+      password2: { equalTo: 'Las contraseñas no coinciden.' },
+      nombre:    { soloLetras: 'El nombre solo acepta letras.' },
+      dni:       { cedulaEcuador: 'Cédula ecuatoriana inválida.' }
+    },
+    submitHandler: function(form){ form.submit(); }
+  });
+</script>
+{% endblock %}

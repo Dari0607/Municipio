@@ -1,0 +1,99 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="py-5">
+  <div class="container mt-4" style="max-width:580px;">
+
+    <h2 class="fw-bold mb-4" style="color:#0077b6;">
+      <i class="bi bi-person-badge me-2"></i>{{ accion }} Funcionario
+    </h2>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+
+        {% if accion == 'Editar' %}
+          <form method="post" action="/funcionarios/actualizar/{{ item.id }}/" id="formFunc">
+        {% else %}
+          <form method="post" action="/funcionarios/guardar/" id="formFunc">
+        {% endif %}
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nombre completo <span class="text-danger">*</span></label>
+            <input type="text" name="nombre" class="form-control"
+                   value="{% if item %}{{ item.nombre }}{% endif %}"
+                   placeholder="Ej: María Fernanda López"
+                   minlength="3" maxlength="200" required>
+            <div class="form-text">Solo letras y espacios.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Legajo <span class="text-danger">*</span></label>
+            <input type="text" name="legajo" class="form-control"
+                   value="{% if item %}{{ item.legajo }}{% endif %}"
+                   placeholder="Ej: F-00123"
+                   maxlength="50" required>
+            <div class="form-text">Letras, números y guiones. Sin espacios.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Email</label>
+            <input type="email" name="email" class="form-control"
+                   value="{% if item %}{{ item.email }}{% endif %}"
+                   placeholder="funcionario@municipio.gob">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Ventanilla asignada</label>
+            <select name="ventanilla" class="form-select">
+              <option value="">— Sin asignar —</option>
+              {% for v in ventanillas %}
+              <option value="{{ v.id }}"
+                {% if item and item.ventanilla_id == v.id %}selected{% endif %}>
+                Ventanilla {{ v.numero }}{% if v.descripcion %} — {{ v.descripcion }}{% endif %}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3 form-check form-switch">
+            <input type="checkbox" name="activo" class="form-check-input" id="chkActivo"
+                   {% if not item or item.activo %}checked{% endif %}>
+            <label class="form-check-label" for="chkActivo">Funcionario activo</label>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1"></i>
+              {% if accion == 'Editar' %}Actualizar{% else %}Guardar{% endif %}
+            </button>
+            <a href="/funcionarios/" class="btn btn-secondary">
+              <i class="bi bi-x-lg me-1"></i>Cancelar
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $('#formFunc').validate({
+    rules: {
+      nombre: { required: true, minlength: 3, soloLetras: true, noRepetido: true },
+      legajo: { required: true, legajoValido: true, noRepetido: true },
+      email:  { email: true }
+    },
+    messages: {
+      nombre: { required: 'El nombre es obligatorio.', minlength: 'Mínimo 3 caracteres.' },
+      legajo: { required: 'El legajo es obligatorio.' }
+    },
+    submitHandler: function (form) { form.submit(); }
+  });
+</script>
+{% endblock %}

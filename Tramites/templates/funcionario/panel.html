@@ -1,0 +1,206 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="py-4">
+  <div class="container-fluid px-4 mt-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div>
+        <h2 class="fw-bold mb-1" style="color:#0077b6;">
+          <i class="bi bi-display me-2"></i>Panel del Funcionario
+        </h2>
+        {% if funcionario %}
+          <p class="text-muted mb-0">
+            <i class="bi bi-person-badge me-1"></i>{{ funcionario.nombre }}
+            {% if ventanilla %}
+              — <span class="badge" style="background:#0077b6;">Ventanilla {{ ventanilla.numero }}</span>
+            {% endif %}
+          </p>
+        {% endif %}
+      </div>
+      <div class="d-flex gap-2">
+        <a href="/panel-ventanillas/" class="btn btn-outline-primary">
+          <i class="bi bi-diagram-3 me-1"></i>Panel Ventanillas
+        </a>
+        <span class="badge bg-secondary d-flex align-items-center px-3">
+          <i class="bi bi-keyboard me-2"></i>
+          Presioná <kbd class="mx-1">Espacio</kbd> o <kbd>Enter</kbd> para llamar al siguiente
+        </span>
+      </div>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- ── Turno en atención ── -->
+      <div class="col-lg-5">
+        <div class="card border-0 shadow h-100" style="border-radius:14px; overflow:hidden;">
+          <div class="card-header py-3" style="background:#0077b6; border:none;">
+            <h5 class="text-white mb-0 fw-bold">
+              <i class="bi bi-person-check me-2"></i>Atendiendo Ahora
+            </h5>
+          </div>
+          <div class="card-body d-flex flex-column align-items-center justify-content-center p-5"
+               id="box-atencion">
+            {% if en_atencion %}
+              <div class="display-1 fw-bold" style="color:#0077b6;" id="numero-display">
+                #{{ en_atencion.numero_turno }}
+              </div>
+              <h4 class="mt-2 fw-semibold" id="ciudadano-display">
+                {{ en_atencion.ciudadano.nombre }}
+              </h4>
+              <span class="badge mt-2 fs-6" style="background:#f0a500; color:#000;"
+                    id="tramite-display">
+                {{ en_atencion.tipo_tramite|default:"Sin especificar" }}
+              </span>
+            {% else %}
+              <div class="display-1 fw-bold text-muted" id="numero-display">—</div>
+              <p class="text-muted mt-2" id="ciudadano-display">Sin turno activo</p>
+              <span class="badge bg-secondary fs-6" id="tramite-display">—</span>
+            {% endif %}
+
+            <button id="btn-llamar"
+                    class="btn btn-lg text-white mt-4 px-5 fw-semibold"
+                    style="background:#0077b6;"
+                    data-ventanilla="{{ ventanilla.id|default:'' }}">
+              <i class="bi bi-megaphone me-2"></i>Llamar Siguiente
+              <small class="d-block" style="font-size:.7rem; opacity:.8;">
+                [Espacio / Enter]
+              </small>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Cola de espera ── -->
+      <div class="col-lg-7">
+        <div class="card border-0 shadow h-100" style="border-radius:14px; overflow:hidden;">
+          <div class="card-header py-3 d-flex justify-content-between align-items-center"
+               style="background:#f8f9fa; border-bottom:2px solid #0077b6;">
+            <h5 class="fw-bold mb-0" style="color:#0077b6;">
+              <i class="bi bi-people me-2"></i>Cola de Espera
+            </h5>
+            <span class="badge fs-6" style="background:#0077b6;" id="badge-cola">
+              {{ cola|length }} esperando
+            </span>
+          </div>
+          <div class="card-body p-0">
+            {% if cola %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0" id="tabla-cola">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-3">#</th>
+                    <th>Ciudadano</th>
+                    <th>Trámite</th>
+                    <th>Esperando</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-cola">
+                  {% for turno in cola %}
+                  <tr id="fila-{{ turno.id }}"
+                      {% if forloop.first %}style="background:#e8f4fd;"{% endif %}>
+                    <td class="ps-3">
+                      <strong style="color:#0077b6;">#{{ turno.numero_turno }}</strong>
+                      {% if forloop.first %}
+                        <span class="badge bg-warning text-dark ms-1">Siguiente</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ turno.ciudadano.nombre }}</td>
+                    <td>{{ turno.tipo_tramite|default:"—" }}</td>
+                    <td>
+                      <small class="text-muted">
+                        {{ turno.fecha_solicitud|date:"H:i" }}
+                      </small>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5" id="cola-vacia">
+              <i class="bi bi-check-circle" style="font-size:3rem; color:#28a745;"></i>
+              <p class="mt-2 text-muted fw-semibold">No hay ciudadanos esperando</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<!-- Hotkeys-js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/hotkeys-js@3.13.7/dist/hotkeys.min.js"></script>
+
+<script>
+  const CSRF = '{{ csrf_token }}';
+  const ventanillaId = document.getElementById('btn-llamar').dataset.ventanilla;
+
+  function llamarSiguiente() {
+    fetch('/llamar-siguiente/', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': CSRF,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `ventanilla_id=${ventanillaId}`
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok) {
+        // Actualizar el display principal
+        document.getElementById('numero-display').textContent  = '#' + data.numero_turno;
+        document.getElementById('ciudadano-display').textContent = data.ciudadano;
+        document.getElementById('tramite-display').textContent   = data.tramite;
+
+        // Quitar la fila del turno llamado de la cola
+        const fila = document.getElementById('fila-' + data.turno_id);
+        if (fila) fila.remove();
+
+        // Actualizar badge contador
+        const filas = document.querySelectorAll('#tbody-cola tr');
+        document.getElementById('badge-cola').textContent = filas.length + ' esperando';
+
+        // Marcar el nuevo "siguiente" en la tabla
+        const primera = document.querySelector('#tbody-cola tr');
+        if (primera) {
+          primera.style.background = '#e8f4fd';
+          const tdNum = primera.querySelector('td:first-child');
+          if (tdNum && !tdNum.querySelector('.badge')) {
+            tdNum.insertAdjacentHTML('beforeend',
+              '<span class="badge bg-warning text-dark ms-1">Siguiente</span>');
+          }
+        }
+
+        // Flash de confirmación
+        Swal.fire({
+          toast: true, position: 'top-end', showConfirmButton: false,
+          timer: 2500, icon: 'success',
+          title: `Llamando turno #${data.numero_turno} — ${data.ciudadano}`
+        });
+
+      } else {
+        Swal.fire({
+          toast: true, position: 'top-end', showConfirmButton: false,
+          timer: 2500, icon: 'info',
+          title: data.mensaje || 'No hay más turnos.'
+        });
+      }
+    });
+  }
+
+  // Botón click
+  document.getElementById('btn-llamar').addEventListener('click', llamarSiguiente);
+
+  // Teclas Espacio y Enter con Hotkeys-js
+  hotkeys('space, enter', function(e) {
+    e.preventDefault();
+    llamarSiguiente();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="py-5">
+  <div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold" style="color:var(--color-primario, #1a3a6b);">
+        <i class="bi bi-file-earmark-text me-2"></i>Tipos de Trámite
+      </h2>
+      <a href="/tipos-tramite/nuevo/" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nuevo Tipo
+      </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <table id="tabla" class="table table-bordered table-hover align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Departamento</th>
+              <th class="text-center">Duración (min)</th>
+              <th class="text-center">Activo</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>{{ item.id }}</td>
+              <td><strong>{{ item.nombre }}</strong></td>
+              <td>{{ item.descripcion|truncatechars:60|default:"—" }}</td>
+              <td>{{ item.departamento|default:"—" }}</td>
+              <td class="text-center">
+                <span class="badge bg-info text-dark">{{ item.duracion_estimada_min }} min</span>
+              </td>
+              <td class="text-center">
+                {% if item.activo %}
+                  <span class="badge bg-success">Sí</span>
+                {% else %}
+                  <span class="badge bg-secondary">No</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <a href="/tipos-tramite/editar/{{ item.id }}/"
+                   class="btn btn-sm btn-warning me-1">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <button class="btn btn-sm btn-danger"
+                        onclick="confirmarEliminar('/tipos-tramite/eliminar/{{ item.id }}/')">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center text-muted">No hay tipos de trámite registrados.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $(document).ready(function () { $('#tabla').DataTable(); });
+</script>
+{% endblock %}

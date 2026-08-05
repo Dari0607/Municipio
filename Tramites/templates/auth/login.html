@@ -1,0 +1,91 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="py-5" style="min-height:80vh; display:flex; align-items:center;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-5 col-lg-4">
+
+        <div class="card border-0 shadow" style="border-radius:16px; overflow:hidden;">
+
+          <!-- Cabecera azul -->
+          <div class="card-header text-center py-4"
+               style="background:#1a3a6b; border:none;">
+            <i class="bi bi-building fs-1 text-white"></i>
+            <h4 class="text-white mt-2 mb-0 fw-bold">Municipio Digital</h4>
+            <p class="text-white-50 small mb-0">Plataforma de Atención Ciudadana</p>
+          </div>
+
+          <div class="card-body p-4">
+            <h5 class="fw-semibold mb-4 text-center" style="color:#1a3a6b;">
+              Iniciar Sesión
+            </h5>
+
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-danger py-2 small">
+                  <i class="bi bi-exclamation-circle me-1"></i>{{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <form method="post" id="formLogin">
+              {% csrf_token %}
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold small">Usuario</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="bi bi-person" style="color:#1a3a6b;"></i>
+                  </span>
+                  <input type="text" name="username" class="form-control border-start-0"
+                         placeholder="Nombre de usuario" required autofocus>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-semibold small">Contraseña</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="bi bi-lock" style="color:#1a3a6b;"></i>
+                  </span>
+                  <input type="password" name="password" class="form-control border-start-0"
+                         placeholder="Contraseña" required>
+                </div>
+              </div>
+
+              <button type="submit" class="btn w-100 text-white fw-semibold"
+                      style="background:#1a3a6b;">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar
+              </button>
+            </form>
+
+            <hr class="my-4">
+            <p class="text-center small text-muted mb-0">
+              ¿No tenés cuenta?
+              <a href="/registro/" class="fw-semibold" style="color:#f0a500;">Registrarse</a>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $('#formLogin').validate({
+    rules: {
+      username: { required: true },
+      password: { required: true }
+    },
+    errorClass: 'text-danger small',
+    highlight:   function(el){ $(el).addClass('is-invalid'); },
+    unhighlight: function(el){ $(el).removeClass('is-invalid').addClass('is-valid'); },
+    submitHandler: function(form){ form.submit(); }
+  });
+</script>
+{% endblock %}

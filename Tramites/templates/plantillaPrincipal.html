@@ -1,0 +1,455 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Municipio Digital — Atención Ciudadana</title>
+  <meta name="description" content="Plataforma de Atención Ciudadana y Trámites Municipales">
+
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS (de Moderna, todos locales) -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- CSS principal de Moderna -->
+  <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+
+  <!-- SweetAlert2 -->
+  <link href="{% static 'assets/vendor/sweetalert2/sweetalert2.min.css' %}" rel="stylesheet">
+  <!-- DataTables -->
+  <link href="{% static 'assets/vendor/datatables/jquery.dataTables.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/datatables/dataTables.bootstrap5.min.css' %}" rel="stylesheet">
+
+  <style>
+    label.error { color: #dc3545; font-size: .82rem; }
+    input.error, textarea.error, select.error { border-color: #dc3545; }
+
+    /* ── Header celeste institucional ── */
+    #header {
+      background-color: #0077b6 !important;
+    }
+    #header .logo .sitename,
+    #header .logo .sitename span {
+      color: #fff !important;
+    }
+    #header .logo .sitename span {
+      color: #ffd166 !important;   /* acento dorado para "Digital" */
+    }
+    /* links del nav */
+    #header .navmenu a,
+    #header .navmenu > ul > li > a {
+      color: #fff !important;
+    }
+    #header .navmenu a:hover,
+    #header .navmenu > ul > li > a:hover,
+    #header .navmenu .active {
+      color: #ffd166 !important;
+    }
+    /* dropdown fondo */
+    #header .navmenu .dropdown ul {
+      background-color: #005f99 !important;
+    }
+    #header .navmenu .dropdown ul a {
+      color: #e0f0ff !important;
+    }
+    #header .navmenu .dropdown ul a:hover {
+      color: #ffd166 !important;
+      background: rgba(255,255,255,.1) !important;
+    }
+
+    /* Botones de sesión en el header */
+    .btn-nav-sesion {
+      font-size: .82rem;
+      padding: .3rem .9rem;
+      border-radius: 20px;
+      margin-left: 6px;
+      border: 1px solid rgba(255,255,255,.5);
+      color: #fff;
+      text-decoration: none;
+      transition: .2s;
+    }
+    .btn-nav-sesion:hover { background: rgba(255,255,255,.15); color: #fff; }
+    .btn-nav-sesion.filled {
+      background: #f0a500;
+      border-color: #f0a500;
+      color: #000;
+    }
+    .btn-nav-sesion.filled:hover { background: #d4920a; }
+
+    .nav-user-info {
+      color: rgba(255,255,255,.7);
+      font-size: .82rem;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+
+<body class="index-page">
+
+  <!-- ══════════════ HEADER ══════════════ -->
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <!-- Logo -->
+      <a href="/" class="logo d-flex align-items-center">
+        <h1 class="sitename">Municipio<span style="color:#f0a500;">Digital</span></h1>
+      </a>
+
+      <!-- Menú de navegación -->
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="/" class="active">Inicio</a></li>
+
+          {% if request.user.is_authenticated %}
+            {% if request.user.is_staff or request.user.is_superuser %}
+
+              <!-- Gestión → dropdown con todos los ABM -->
+              <li class="dropdown">
+                <a href="#"><span>Gestión</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                <ul>
+                  <li><a href="/departamentos/"><i class="bi bi-building me-2"></i>Departamentos</a></li>
+                  <li><a href="/ventanillas/"><i class="bi bi-door-open me-2"></i>Ventanillas</a></li>
+                  <li><a href="/funcionarios/"><i class="bi bi-person-badge me-2"></i>Funcionarios</a></li>
+                  <li><a href="/tipos-tramite/"><i class="bi bi-file-earmark-text me-2"></i>Tipos de Trámite</a></li>
+                  <li><a href="/ciudadanos/"><i class="bi bi-people me-2"></i>Ciudadanos</a></li>
+                </ul>
+              </li>
+
+              <!-- Operaciones → turnos y expedientes -->
+              <li class="dropdown">
+                <a href="#"><span>Operaciones</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                <ul>
+                  <li><a href="/turnos/"><i class="bi bi-ticket-perforated me-2"></i>Turnos</a></li>
+                  <li><a href="/turnos/nuevo/"><i class="bi bi-plus-circle me-2"></i>Nuevo Turno</a></li>
+                  <li><a href="/expedientes/"><i class="bi bi-folder2-open me-2"></i>Expedientes</a></li>
+                  <li><a href="/expedientes/nuevo/"><i class="bi bi-plus-circle me-2"></i>Nuevo Expediente</a></li>
+                </ul>
+              </li>
+
+              <li><a href="/dashboard/"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
+              <li><a href="/panel-funcionario/"><i class="bi bi-display me-1"></i>Panel Atención</a></li>
+              <li><a href="/admin/"><i class="bi bi-gear me-1"></i>Admin</a></li>
+
+            {% else %}
+              <li><a href="/solicitar-turno/">Solicitar Turno</a></li>
+              <li><a href="/mis-turnos/">Mis Turnos</a></li>
+              <li><a href="/sala-espera/">Sala de Espera</a></li>
+            {% endif %}
+
+          {% else %}
+            <li><a href="/login/">Ingresar</a></li>
+            <li><a href="/registro/">Registrarse</a></li>
+          {% endif %}
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <!-- Info de sesión -->
+      <div class="d-none d-xl-flex align-items-center">
+        {% if request.user.is_authenticated %}
+          <span class="nav-user-info">
+            <i class="bi bi-person-circle me-1"></i>{{ request.user.username }}
+          </span>
+          <a href="/logout/" class="btn-nav-sesion">
+            <i class="bi bi-box-arrow-right me-1"></i>Salir
+          </a>
+        {% else %}
+          <a href="/login/" class="btn-nav-sesion">
+            <i class="bi bi-person me-1"></i>Ingresar
+          </a>
+          <a href="/registro/" class="btn-nav-sesion filled">
+            <i class="bi bi-person-plus me-1"></i>Registrarse
+          </a>
+        {% endif %}
+      </div>
+
+    </div>
+  </header>
+  <!-- ══════════════ FIN HEADER ══════════════ -->
+
+
+  <!-- ══════════════ CONTENIDO ══════════════ -->
+  <main class="main">
+
+    {% block contenido %}
+
+    <!-- ── Hero con carousel (igual a Moderna) ── -->
+    <section id="hero" class="hero section dark-background">
+
+      <div id="hero-carousel" class="carousel carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="container position-relative">
+
+          <div class="carousel-item active">
+            <div class="carousel-container">
+              <h2>Bienvenido al Municipio Digital</h2>
+              <p>Gestioná tus trámites, solicitá turnos y seguí el estado de tus expedientes
+                desde un solo lugar, sin hacer filas.</p>
+              {% if request.user.is_authenticated %}
+                <a href="/solicitar-turno/" class="btn-get-started">Solicitar Turno</a>
+              {% else %}
+                <a href="/registro/" class="btn-get-started">Comenzar</a>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="carousel-item">
+            <div class="carousel-container">
+              <h2>Cita Previa Online</h2>
+              <p>Elegí el día y horario que más te convenga para tu trámite presencial.
+                Nuestro sistema de turnos te ahorra tiempo y evita esperas innecesarias.</p>
+              <a href="/solicitar-turno/" class="btn-get-started">Reservar Turno</a>
+            </div>
+          </div>
+
+          <div class="carousel-item">
+            <div class="carousel-container">
+              <h2>Seguimiento de Expedientes</h2>
+              <p>Consultá en tiempo real en qué ventanilla está tu expediente y cuál es
+                su estado de tramitación dentro del municipio.</p>
+              <a href="/mis-turnos/" class="btn-get-started">Ver Mis Trámites</a>
+            </div>
+          </div>
+
+          <a class="carousel-control-prev" href="#hero-carousel" role="button" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon bi bi-chevron-left" aria-hidden="true"></span>
+          </a>
+          <a class="carousel-control-next" href="#hero-carousel" role="button" data-bs-slide="next">
+            <span class="carousel-control-next-icon bi bi-chevron-right" aria-hidden="true"></span>
+          </a>
+          <ol class="carousel-indicators"></ol>
+
+        </div>
+      </div>
+
+    </section><!-- /Hero -->
+
+    <!-- ── Servicios destacados (igual estructura a Moderna) ── -->
+    <section id="featured-services" class="featured-services section">
+      <div class="container">
+        <div class="row gy-4">
+
+          <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="service-item item-cyan position-relative">
+              <div class="icon"><i class="bi bi-calendar-check"></i></div>
+              <a href="/solicitar-turno/" class="stretched-link"><h3>Cita Previa</h3></a>
+              <p>Reservá tu turno online para trámites presenciales en el municipio, sin esperar en fila.</p>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="service-item item-orange position-relative">
+              <div class="icon"><i class="bi bi-diagram-3"></i></div>
+              <a href="/mis-turnos/" class="stretched-link"><h3>Seguimiento</h3></a>
+              <p>Seguí el estado de tus expedientes y en qué ventanilla se encuentra en proceso.</p>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="service-item item-teal position-relative">
+              <div class="icon"><i class="bi bi-file-earmark-check"></i></div>
+              <a href="#tramites" class="stretched-link"><h3>Trámites</h3></a>
+              <p>Licencias, certificados, habilitaciones comerciales y más desde un solo portal.</p>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+            <div class="service-item item-red position-relative">
+              <div class="icon"><i class="bi bi-speedometer2"></i></div>
+              <a href="/dashboard/" class="stretched-link"><h3>Dashboard</h3></a>
+              <p>Estadísticas de tiempos de espera, atención y volumen de trámites por departamento.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section><!-- /Servicios -->
+
+    <!-- ── Sección Acerca ── -->
+    <section id="about" class="about section light-background">
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="100">
+            <h3>Una plataforma pensada para el ciudadano</h3>
+            <p class="fst-italic">
+              Optimizamos la atención municipal para que puedas resolver tus trámites
+              de forma rápida, transparente y sin complicaciones.
+            </p>
+            <ul>
+              <li><i class="bi bi-check2-all"></i> <span>Solicitá turnos desde tu casa, en cualquier horario.</span></li>
+              <li><i class="bi bi-check2-all"></i> <span>Recibí notificaciones sobre el estado de tus expedientes.</span></li>
+              <li><i class="bi bi-check2-all"></i> <span>Los funcionarios atienden de forma ordenada y eficiente con herramientas modernas.</span></li>
+            </ul>
+            <p>
+              El sistema permite la derivación visual de expedientes entre ventanillas,
+              llamada al siguiente ciudadano con teclas de acceso rápido y un tour interactivo
+              para guiarte en la solicitud de licencias.
+            </p>
+          </div>
+          <div class="col-lg-6 position-relative align-self-start" data-aos="fade-up" data-aos-delay="200">
+            <img src="{% static 'assets/img/about.jpg' %}" class="img-fluid" alt="Atención ciudadana">
+          </div>
+        </div>
+      </div>
+    </section><!-- /About -->
+
+    {% endblock %}
+
+  </main>
+  <!-- ══════════════ FIN CONTENIDO ══════════════ -->
+
+
+  <!-- ══════════════ FOOTER (estructura Moderna) ══════════════ -->
+  <footer id="footer" class="footer dark-background">
+
+    <div class="footer-newsletter">
+      <div class="container">
+        <div class="row justify-content-center text-center">
+          <div class="col-lg-6">
+            <h4>Novedades del Municipio</h4>
+            <p>Suscribite para recibir avisos sobre nuevos trámites, fechas importantes y servicios municipales.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container footer-top">
+      <div class="row gy-4">
+
+        <div class="col-lg-4 col-md-6 footer-about">
+          <a href="/" class="d-flex align-items-center">
+            <span class="sitename">MunicipioDig</span>
+          </a>
+          <div class="footer-contact pt-3">
+            <p>Av. San Martín 100, Centro Cívico</p>
+            <p class="mt-3"><strong>Teléfono:</strong> <span>(0000) 000-0000</span></p>
+            <p><strong>Email:</strong> <span>atencion@municipio.gob</span></p>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Ciudadanos</h4>
+          <ul>
+            <li><i class="bi bi-chevron-right"></i> <a href="/">Inicio</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="/solicitar-turno/">Solicitar Turno</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="/mis-turnos/">Mis Turnos</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="/registro/">Registrarse</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Trámites</h4>
+          <ul>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Licencias</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Certificados</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Habilitaciones</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Consultas</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+          <h4>Seguinos</h4>
+          <p>Seguí las novedades y avisos del municipio en redes sociales.</p>
+          <div class="social-links d-flex">
+            <a href=""><i class="bi bi-twitter-x"></i></a>
+            <a href=""><i class="bi bi-facebook"></i></a>
+            <a href=""><i class="bi bi-instagram"></i></a>
+            <a href=""><i class="bi bi-youtube"></i></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="container copyright text-center mt-4">
+      <p>© <span>2025</span> <strong class="px-1 sitename">Municipio Digital</strong> <span>— Todos los derechos reservados</span></p>
+    </div>
+
+  </footer>
+  <!-- ══════════════ FIN FOOTER ══════════════ -->
+
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+  </a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+
+  <!-- ══════════════ SCRIPTS ══════════════ -->
+  <!-- Vendor JS de Moderna (todos locales) -->
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/waypoints/noframework.waypoints.js' %}"></script>
+  <script src="{% static 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+  <!-- JS principal de Moderna (inicializa AOS, swiper, carousel, scroll-top, etc.) -->
+  <script src="{% static 'assets/js/main.js' %}"></script>
+
+  <!-- jQuery (necesario para DataTables y Validate) -->
+  <script src="{% static 'assets/vendor/jquery/jquery.min.js' %}"></script>
+  <!-- DataTables -->
+  <script src="{% static 'assets/vendor/datatables/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/datatables/dataTables.bootstrap5.min.js' %}"></script>
+  <!-- jQuery Validate -->
+  <script src="{% static 'assets/vendor/jquery-validation/jquery.validate.min.js' %}"></script>
+  <!-- Validaciones personalizadas Municipio -->
+  <script src="{% static 'assets/js/validaciones.js' %}"></script>
+  <!-- SweetAlert2 -->
+  <script src="{% static 'assets/vendor/sweetalert2/sweetalert2.all.min.js' %}"></script>
+
+  <!-- Mensajes Django → SweetAlert2 -->
+  {% if messages %}
+    {% for message in messages %}
+    <script>
+      Swal.fire({
+        title: "{% if message.tags == 'error' %}¡Error!{% else %}¡Listo!{% endif %}",
+        icon:  "{{ message.tags }}",
+        text:  "{{ message }}",
+        confirmButtonText:  "Aceptar",
+        confirmButtonColor: "#2e6da4"
+      });
+    </script>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Confirmar eliminación -->
+  <script>
+    function confirmarEliminar(url) {
+      Swal.fire({
+        title:              "¿Estás seguro?",
+        text:               "¡No podrás revertir esto!",
+        icon:               "warning",
+        showCancelButton:   true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor:  "#6c757d",
+        confirmButtonText:  "Sí, eliminar",
+        cancelButtonText:   "Cancelar"
+      }).then((result) => {
+        if (result.isConfirmed) { window.location.href = url; }
+      });
+      return false;
+    }
+  </script>
+
+  {% block scripts %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="py-5">
+  <div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold" style="color:var(--color-primario, #1a3a6b);">
+        <i class="bi bi-folder2-open me-2"></i>Expedientes
+      </h2>
+      <a href="/expedientes/nuevo/" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nuevo Expediente
+      </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <table id="tabla" class="table table-bordered table-hover align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Número</th>
+              <th>Turno</th>
+              <th>Ciudadano</th>
+              <th>Ventanilla Actual</th>
+              <th class="text-center">Estado</th>
+              <th>Fecha Inicio</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>{{ item.id }}</td>
+              <td><strong>{{ item.numero }}</strong></td>
+              <td>#{{ item.turno.numero_turno }}</td>
+              <td>{{ item.turno.ciudadano.nombre }}</td>
+              <td>{{ item.ventanilla_actual|default:"—" }}</td>
+              <td class="text-center">
+                {% if item.estado == 'iniciado' %}
+                  <span class="badge bg-secondary">Iniciado</span>
+                {% elif item.estado == 'en_proceso' %}
+                  <span class="badge bg-primary">En Proceso</span>
+                {% elif item.estado == 'derivado' %}
+                  <span class="badge bg-info text-dark">Derivado</span>
+                {% else %}
+                  <span class="badge bg-success">Cerrado</span>
+                {% endif %}
+              </td>
+              <td>{{ item.fecha_inicio|date:"d/m/Y H:i" }}</td>
+              <td class="text-center">
+                <a href="/expedientes/editar/{{ item.id }}/"
+                   class="btn btn-sm btn-warning me-1">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <button class="btn btn-sm btn-danger"
+                        onclick="confirmarEliminar('/expedientes/eliminar/{{ item.id }}/')">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" class="text-center text-muted">No hay expedientes registrados.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $(document).ready(function () {
+    $('#tabla').DataTable({ order: [[6, 'desc']] });
+  });
+</script>
+{% endblock %}

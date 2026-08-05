@@ -1,0 +1,173 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="py-4">
+  <div class="container-fluid px-4 mt-3">
+
+    <h2 class="fw-bold mb-4" style="color:#0077b6;">
+      <i class="bi bi-speedometer2 me-2"></i>Dashboard — Atención Ciudadana
+    </h2>
+
+    <!-- ── Tarjetas resumen ── -->
+    <div class="row gy-3 mb-5">
+
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-4"
+             style="border-radius:12px; border-top:4px solid #0077b6 !important;">
+          <div class="fs-1 fw-bold" style="color:#0077b6;">{{ total_turnos }}</div>
+          <div class="text-muted small fw-semibold">Total Turnos</div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-4"
+             style="border-radius:12px; border-top:4px solid #f0a500 !important;">
+          <div class="fs-1 fw-bold" style="color:#f0a500;">{{ total_pendientes }}</div>
+          <div class="text-muted small fw-semibold">Pendientes</div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-4"
+             style="border-radius:12px; border-top:4px solid #28a745 !important;">
+          <div class="fs-1 fw-bold text-success">{{ total_resueltos }}</div>
+          <div class="text-muted small fw-semibold">Resueltos</div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-4"
+             style="border-radius:12px; border-top:4px solid #17a2b8 !important;">
+          <div class="fs-1 fw-bold text-info">{{ total_atencion }}</div>
+          <div class="text-muted small fw-semibold">En Atención</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Tiempos promedio ── -->
+    <div class="row gy-3 mb-5">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-4" style="border-radius:12px;">
+          <div class="d-flex align-items-center gap-3">
+            <div style="width:60px;height:60px;border-radius:50%;background:#e8f4fd;
+                        display:flex;align-items:center;justify-content:center;">
+              <i class="bi bi-hourglass-split fs-3" style="color:#0077b6;"></i>
+            </div>
+            <div>
+              <div class="fs-2 fw-bold" style="color:#0077b6;">{{ espera_min }} min</div>
+              <div class="text-muted fw-semibold">Tiempo promedio de espera en sala</div>
+              <small class="text-muted">Desde que saca el turno hasta que es llamado</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-4" style="border-radius:12px;">
+          <div class="d-flex align-items-center gap-3">
+            <div style="width:60px;height:60px;border-radius:50%;background:#e8f7ed;
+                        display:flex;align-items:center;justify-content:center;">
+              <i class="bi bi-person-check fs-3 text-success"></i>
+            </div>
+            <div>
+              <div class="fs-2 fw-bold text-success">{{ atencion_min }} min</div>
+              <div class="text-muted fw-semibold">Tiempo promedio de atención</div>
+              <small class="text-muted">Desde que es llamado hasta que se resuelve</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Gráficos ── -->
+    <div class="row gy-4">
+
+      <!-- Volumen por departamento -->
+      <div class="col-lg-7">
+        <div class="card border-0 shadow-sm p-4" style="border-radius:12px;">
+          <h5 class="fw-bold mb-3" style="color:#0077b6;">
+            <i class="bi bi-bar-chart me-2"></i>Trámites Resueltos por Departamento
+          </h5>
+          <canvas id="graficoDep" height="260"></canvas>
+        </div>
+      </div>
+
+      <!-- Distribución por estado -->
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-sm p-4" style="border-radius:12px;">
+          <h5 class="fw-bold mb-3" style="color:#0077b6;">
+            <i class="bi bi-pie-chart me-2"></i>Distribución por Estado
+          </h5>
+          <canvas id="graficoEstado" height="260"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+  // ── Gráfico barras: trámites por departamento ──
+  const depLabels = {{ dep_labels|safe }};
+  const depData   = {{ dep_data|safe }};
+
+  new Chart(document.getElementById('graficoDep'), {
+    type: 'bar',
+    data: {
+      labels: depLabels.length ? depLabels : ['Sin datos'],
+      datasets: [{
+        label: 'Trámites resueltos',
+        data:  depData.length ? depData : [0],
+        backgroundColor: [
+          '#0077b6','#00b4d8','#90e0ef','#f0a500','#28a745',
+          '#17a2b8','#6c757d','#dc3545','#fd7e14','#6f42c1'
+        ],
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+      }
+    }
+  });
+
+  // ── Gráfico dona: distribución por estado ──
+  const estadoLabels = {{ estado_labels|safe }};
+  const estadoData   = {{ estado_data|safe }};
+  const estadoColores = {
+    'pendiente':   '#f0a500',
+    'en_atencion': '#0077b6',
+    'derivado':    '#17a2b8',
+    'resuelto':    '#28a745',
+    'ausente':     '#6c757d',
+  };
+
+  new Chart(document.getElementById('graficoEstado'), {
+    type: 'doughnut',
+    data: {
+      labels: estadoLabels.length ? estadoLabels : ['Sin datos'],
+      datasets: [{
+        data: estadoData.length ? estadoData : [1],
+        backgroundColor: estadoLabels.map(e => estadoColores[e] || '#aaa'),
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+</script>
+{% endblock %}

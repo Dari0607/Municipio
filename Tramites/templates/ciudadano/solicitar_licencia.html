@@ -1,0 +1,205 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="py-5">
+  <div class="container mt-4" style="max-width:680px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold mb-1" style="color:#0077b6;">
+          <i class="bi bi-card-checklist me-2"></i>Solicitar Licencia
+        </h2>
+        <p class="text-muted mb-0">Completá el formulario para iniciar tu trámite de licencia.</p>
+      </div>
+      <button id="btn-tour" class="btn text-white fw-semibold"
+              style="background:#f0a500; color:#000 !important;">
+        <i class="bi bi-question-circle me-1"></i>Guía paso a paso
+      </button>
+    </div>
+
+    <div class="card border-0 shadow-sm" style="border-radius:14px; overflow:hidden;">
+
+      <div class="card-header py-3 px-4" style="background:#0077b6; border:none;">
+        <span class="text-white fw-semibold">
+          <i class="bi bi-person-circle me-2"></i>
+          Ciudadano: {{ request.user.ciudadano.nombre }}
+        </span>
+      </div>
+
+      <div class="card-body p-4">
+        <form method="post" id="formLicencia">
+          {% csrf_token %}
+
+          <!-- Tipo de licencia -->
+          <div class="mb-4" id="tour-tipo">
+            <label class="form-label fw-semibold">
+              Tipo de Licencia <span class="text-danger">*</span>
+            </label>
+            {% if tipos_licencia %}
+            <select name="tipo_tramite" class="form-select form-select-lg" required>
+              <option value="">— Seleccioná el tipo de licencia —</option>
+              {% for tipo in tipos_licencia %}
+              <option value="{{ tipo.id }}">{{ tipo.nombre }}</option>
+              {% endfor %}
+            </select>
+            {% else %}
+            <!-- Si no hay tipos con "licencia", mostrar todos -->
+            <p class="text-muted small">
+              No se encontraron tipos de licencia configurados.
+              <a href="/solicitar-turno/">Solicitá un turno general</a>.
+            </p>
+            {% endif %}
+          </div>
+
+          <!-- Datos del solicitante (solo lectura) -->
+          <div class="mb-4 p-3 rounded" id="tour-datos"
+               style="background:#f8f9fa; border-left:4px solid #0077b6;">
+            <div class="fw-semibold mb-2" style="color:#0077b6;">
+              <i class="bi bi-person me-1"></i>Datos del solicitante
+            </div>
+            <div class="row small">
+              <div class="col-6">
+                <span class="text-muted">Nombre:</span><br>
+                <strong>{{ request.user.ciudadano.nombre }}</strong>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">DNI:</span><br>
+                <strong>{{ request.user.ciudadano.dni }}</strong>
+              </div>
+              <div class="col-6 mt-2">
+                <span class="text-muted">Email:</span><br>
+                <strong>{{ request.user.ciudadano.email|default:"—" }}</strong>
+              </div>
+              <div class="col-6 mt-2">
+                <span class="text-muted">Teléfono:</span><br>
+                <strong>{{ request.user.ciudadano.telefono|default:"—" }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fecha preferida -->
+          <div class="mb-4" id="tour-fecha">
+            <label class="form-label fw-semibold">Fecha y hora preferida</label>
+            <input type="datetime-local" name="fecha_cita" class="form-control form-control-lg">
+            <div class="form-text">
+              <i class="bi bi-info-circle me-1"></i>Opcional — el municipio puede reasignarte un horario.
+            </div>
+          </div>
+
+          <!-- Observaciones -->
+          <div class="mb-4" id="tour-obs">
+            <label class="form-label fw-semibold">Observaciones / Documentación adicional</label>
+            <textarea name="observaciones" class="form-control" rows="3"
+                      placeholder="Indicá si tenés documentación especial o algún requerimiento particular..."></textarea>
+          </div>
+
+          <!-- Aviso -->
+          <div class="alert alert-info py-2 small" id="tour-aviso">
+            <i class="bi bi-info-circle me-2"></i>
+            Una vez enviada la solicitud, recibirás un número de turno.
+            Presentate el día indicado con tu DNI y la documentación requerida.
+          </div>
+
+          <!-- Botones -->
+          <div class="d-flex gap-2" id="tour-enviar">
+            <button type="submit" class="btn text-white fw-semibold flex-fill"
+                    style="background:#0077b6;">
+              <i class="bi bi-send me-2"></i>Enviar Solicitud
+            </button>
+            <a href="/solicitar-turno/" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left me-1"></i>Volver
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<!-- Driver.js CDN -->
+<link href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+
+<script>
+// ── Tour interactivo con Driver.js ──
+const tour = window.driver.js.driver({
+  showProgress: true,
+  steps: [
+    {
+      element: '#tour-tipo',
+      popover: {
+        title:       '1. Tipo de Licencia',
+        description: 'Seleccioná el tipo de licencia que necesitás tramitar: conducir, comercial, habilitación, etc.',
+        side:        'bottom',
+        align:       'start',
+      }
+    },
+    {
+      element: '#tour-datos',
+      popover: {
+        title:       '2. Tus Datos',
+        description: 'Verificá que tus datos personales sean correctos. Si hay un error, actualizalos en tu perfil.',
+        side:        'bottom',
+        align:       'start',
+      }
+    },
+    {
+      element: '#tour-fecha',
+      popover: {
+        title:       '3. Fecha Preferida',
+        description: 'Elegí el día y horario que más te convenga. El municipio confirmará la disponibilidad.',
+        side:        'top',
+        align:       'start',
+      }
+    },
+    {
+      element: '#tour-obs',
+      popover: {
+        title:       '4. Observaciones',
+        description: 'Si tenés documentación especial o alguna necesidad particular, indicala aquí.',
+        side:        'top',
+        align:       'start',
+      }
+    },
+    {
+      element: '#tour-aviso',
+      popover: {
+        title:       '5. ¿Qué pasa después?',
+        description: 'Al enviar recibirás un número de turno. Presentate con tu DNI y la documentación el día indicado.',
+        side:        'top',
+        align:       'start',
+      }
+    },
+    {
+      element: '#tour-enviar',
+      popover: {
+        title:       '6. Enviar Solicitud',
+        description: '¡Listo! Hacé clic en "Enviar Solicitud" para completar el proceso.',
+        side:        'top',
+        align:       'start',
+      }
+    },
+  ]
+});
+
+// Iniciar tour al hacer clic en el botón
+document.getElementById('btn-tour').addEventListener('click', function () {
+  tour.drive();
+});
+
+// ── Validación ──
+$('#formLicencia').validate({
+  rules:      { tipo_tramite: { required: true } },
+  messages:   { tipo_tramite: 'Seleccioná un tipo de licencia.' },
+  errorClass: 'text-danger small',
+  highlight:   function(el){ $(el).addClass('is-invalid'); },
+  unhighlight: function(el){ $(el).removeClass('is-invalid').addClass('is-valid'); },
+  submitHandler: function(form){ form.submit(); }
+});
+</script>
+{% endblock %}

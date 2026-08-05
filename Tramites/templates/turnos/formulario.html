@@ -1,0 +1,137 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="py-5">
+  <div class="container mt-4" style="max-width:640px;">
+
+    <h2 class="fw-bold mb-4" style="color:var(--color-primario, #1a3a6b);">
+      <i class="bi bi-ticket-perforated me-2"></i>{{ accion }} Turno
+    </h2>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+
+        {% if accion == 'Editar' %}
+          <form method="post" action="/turnos/actualizar/{{ item.id }}/" id="formTurno">
+        {% else %}
+          <form method="post" action="/turnos/guardar/" id="formTurno">
+        {% endif %}
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Número de Turno <span class="text-danger">*</span></label>
+              <input type="number" name="numero_turno" class="form-control"
+                     value="{% if item %}{{ item.numero_turno }}{% endif %}"
+                     min="1" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Estado</label>
+              <select name="estado" class="form-select">
+                <option value="pendiente"   {% if item and item.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                <option value="en_atencion" {% if item and item.estado == 'en_atencion' %}selected{% endif %}>En Atención</option>
+                <option value="derivado"    {% if item and item.estado == 'derivado' %}selected{% endif %}>Derivado</option>
+                <option value="resuelto"    {% if item and item.estado == 'resuelto' %}selected{% endif %}>Resuelto</option>
+                <option value="ausente"     {% if item and item.estado == 'ausente' %}selected{% endif %}>Ausente</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Ciudadano <span class="text-danger">*</span></label>
+            <select name="ciudadano" class="form-select" required>
+              <option value="">— Seleccionar —</option>
+              {% for c in ciudadanos %}
+              <option value="{{ c.id }}"
+                {% if item and item.ciudadano_id == c.id %}selected{% endif %}>
+                {{ c.nombre }} — DNI {{ c.dni }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Tipo de Trámite</label>
+            <select name="tipo_tramite" class="form-select">
+              <option value="">— Sin definir —</option>
+              {% for t in tipos %}
+              <option value="{{ t.id }}"
+                {% if item and item.tipo_tramite_id == t.id %}selected{% endif %}>
+                {{ t.nombre }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Ventanilla</label>
+              <select name="ventanilla" class="form-select">
+                <option value="">— Sin asignar —</option>
+                {% for v in ventanillas %}
+                <option value="{{ v.id }}"
+                  {% if item and item.ventanilla_id == v.id %}selected{% endif %}>
+                  Ventanilla {{ v.numero }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Funcionario</label>
+              <select name="funcionario" class="form-select">
+                <option value="">— Sin asignar —</option>
+                {% for f in funcionarios %}
+                <option value="{{ f.id }}"
+                  {% if item and item.funcionario_id == f.id %}selected{% endif %}>
+                  {{ f.nombre }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Fecha y hora de cita</label>
+            <input type="datetime-local" name="fecha_cita" class="form-control"
+                   value="{% if item and item.fecha_cita %}{{ item.fecha_cita|date:'Y-m-d\TH:i' }}{% endif %}">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Observaciones</label>
+            <textarea name="observaciones" class="form-control" rows="3"
+                      maxlength="500">{% if item %}{{ item.observaciones }}{% endif %}</textarea>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1"></i>
+              {% if accion == 'Editar' %}Actualizar{% else %}Guardar{% endif %}
+            </button>
+            <a href="/turnos/" class="btn btn-secondary">
+              <i class="bi bi-x-lg me-1"></i>Cancelar
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $('#formTurno').validate({
+    rules: {
+      numero_turno: { required: true, min: 1, digits: true },
+      ciudadano:    { required: true }
+    },
+    errorClass: 'text-danger small',
+    highlight:   function(el){ $(el).addClass('is-invalid'); },
+    unhighlight: function(el){ $(el).removeClass('is-invalid').addClass('is-valid'); },
+    submitHandler: function(form){ form.submit(); }
+  });
+</script>
+{% endblock %}

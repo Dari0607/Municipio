@@ -1,0 +1,102 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="py-5">
+  <div class="container mt-4" style="max-width:600px;">
+
+    <h2 class="fw-bold mb-4" style="color:var(--color-primario, #1a3a6b);">
+      <i class="bi bi-folder2-open me-2"></i>{{ accion }} Expediente
+    </h2>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+
+        {% if accion == 'Editar' %}
+          <form method="post" action="/expedientes/actualizar/{{ item.id }}/" id="formExp">
+        {% else %}
+          <form method="post" action="/expedientes/guardar/" id="formExp">
+        {% endif %}
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Número de Expediente <span class="text-danger">*</span></label>
+            <input type="text" name="numero" class="form-control"
+                   value="{% if item %}{{ item.numero }}{% endif %}"
+                   maxlength="50" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Turno asociado <span class="text-danger">*</span></label>
+            <select name="turno" class="form-select" required>
+              <option value="">— Seleccionar —</option>
+              {% for t in turnos %}
+              <option value="{{ t.id }}"
+                {% if item and item.turno_id == t.id %}selected{% endif %}>
+                #{{ t.numero_turno }} — {{ t.ciudadano.nombre }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Ventanilla actual</label>
+            <select name="ventanilla_actual" class="form-select">
+              <option value="">— Sin asignar —</option>
+              {% for v in ventanillas %}
+              <option value="{{ v.id }}"
+                {% if item and item.ventanilla_actual_id == v.id %}selected{% endif %}>
+                Ventanilla {{ v.numero }}{% if v.descripcion %} — {{ v.descripcion }}{% endif %}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Estado</label>
+            <select name="estado" class="form-select">
+              <option value="iniciado"   {% if item and item.estado == 'iniciado' %}selected{% endif %}>Iniciado</option>
+              <option value="en_proceso" {% if item and item.estado == 'en_proceso' %}selected{% endif %}>En Proceso</option>
+              <option value="derivado"   {% if item and item.estado == 'derivado' %}selected{% endif %}>Derivado</option>
+              <option value="cerrado"    {% if item and item.estado == 'cerrado' %}selected{% endif %}>Cerrado</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Notas</label>
+            <textarea name="notas" class="form-control" rows="3"
+                      maxlength="1000">{% if item %}{{ item.notas }}{% endif %}</textarea>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1"></i>
+              {% if accion == 'Editar' %}Actualizar{% else %}Guardar{% endif %}
+            </button>
+            <a href="/expedientes/" class="btn btn-secondary">
+              <i class="bi bi-x-lg me-1"></i>Cancelar
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $('#formExp').validate({
+    rules: {
+      numero: { required: true },
+      turno:  { required: true }
+    },
+    errorClass: 'text-danger small',
+    highlight:   function(el){ $(el).addClass('is-invalid'); },
+    unhighlight: function(el){ $(el).removeClass('is-invalid').addClass('is-valid'); },
+    submitHandler: function(form){ form.submit(); }
+  });
+</script>
+{% endblock %}

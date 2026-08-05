@@ -1,0 +1,96 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="py-5">
+  <div class="container mt-4" style="max-width:600px;">
+
+    <h2 class="fw-bold mb-4" style="color:#0077b6;">
+      <i class="bi bi-file-earmark-text me-2"></i>{{ accion }} Tipo de Trámite
+    </h2>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+
+        {% if accion == 'Editar' %}
+          <form method="post" action="/tipos-tramite/actualizar/{{ item.id }}/" id="formTipo">
+        {% else %}
+          <form method="post" action="/tipos-tramite/guardar/" id="formTipo">
+        {% endif %}
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nombre <span class="text-danger">*</span></label>
+            <input type="text" name="nombre" class="form-control"
+                   value="{% if item %}{{ item.nombre }}{% endif %}"
+                   placeholder="Ej: Licencia de Conducir"
+                   minlength="3" maxlength="200" required>
+            <div class="form-text">Solo letras y espacios.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Descripción</label>
+            <textarea name="descripcion" class="form-control" rows="3"
+                      maxlength="500"
+                      placeholder="Descripción del trámite...">{% if item %}{{ item.descripcion }}{% endif %}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Departamento</label>
+            <select name="departamento" class="form-select">
+              <option value="">— Sin departamento —</option>
+              {% for dep in departamentos %}
+              <option value="{{ dep.id }}"
+                {% if item and item.departamento_id == dep.id %}selected{% endif %}>
+                {{ dep.nombre }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Duración estimada (minutos)</label>
+            <input type="number" name="duracion_estimada_min" class="form-control"
+                   value="{% if item %}{{ item.duracion_estimada_min }}{% else %}15{% endif %}"
+                   min="1" max="480" placeholder="Ej: 20">
+            <div class="form-text">Solo números. Entre 1 y 480 minutos.</div>
+          </div>
+
+          <div class="mb-3 form-check form-switch">
+            <input type="checkbox" name="activo" class="form-check-input" id="chkActivo"
+                   {% if not item or item.activo %}checked{% endif %}>
+            <label class="form-check-label" for="chkActivo">Trámite activo</label>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1"></i>
+              {% if accion == 'Editar' %}Actualizar{% else %}Guardar{% endif %}
+            </button>
+            <a href="/tipos-tramite/" class="btn btn-secondary">
+              <i class="bi bi-x-lg me-1"></i>Cancelar
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $('#formTipo').validate({
+    rules: {
+      nombre:               { required: true, minlength: 3, soloLetras: true, noRepetido: true },
+      duracion_estimada_min: { soloNumeros: true, min: 1, max: 480 }
+    },
+    messages: {
+      nombre: { required: 'El nombre es obligatorio.' }
+    },
+    submitHandler: function (form) { form.submit(); }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'plantillaPrincipal.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="py-5">
+  <div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold" style="color:var(--color-primario, #1a3a6b);">
+        <i class="bi bi-person-badge me-2"></i>Funcionarios
+      </h2>
+      <a href="/funcionarios/nuevo/" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nuevo Funcionario
+      </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <table id="tabla" class="table table-bordered table-hover align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Legajo</th>
+              <th>Email</th>
+              <th>Ventanilla</th>
+              <th class="text-center">Activo</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>{{ item.id }}</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div style="width:38px;height:38px;border-radius:50%;background:#2e6da4;
+                              color:#fff;font-weight:700;font-size:1rem;
+                              display:flex;align-items:center;justify-content:center;">
+                    {{ item.nombre|first|upper }}
+                  </div>
+                  {{ item.nombre }}
+                </div>
+              </td>
+              <td>{{ item.legajo }}</td>
+              <td>{{ item.email|default:"—" }}</td>
+              <td>{{ item.ventanilla|default:"—" }}</td>
+              <td class="text-center">
+                {% if item.activo %}
+                  <span class="badge bg-success">Sí</span>
+                {% else %}
+                  <span class="badge bg-secondary">No</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <a href="/funcionarios/editar/{{ item.id }}/"
+                   class="btn btn-sm btn-warning me-1">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <button class="btn btn-sm btn-danger"
+                        onclick="confirmarEliminar('/funcionarios/eliminar/{{ item.id }}/')">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center text-muted">No hay funcionarios registrados.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $(document).ready(function () { $('#tabla').DataTable(); });
+</script>
+{% endblock %}
