@@ -603,19 +603,35 @@ def solicitar_turno(request):
     tipos = TipoTramite.objects.filter(activo=True)
 
     if request.method == 'POST':
-        tipo_id   = request.POST.get('tipo_tramite')
-        fecha_cita = request.POST.get('fecha_cita') or None
+        tipo_id    = request.POST.get('tipo_tramite')
+        fecha_str  = request.POST.get('fecha_cita', '').strip()
+
+        # Convertir string a datetime y validar que no sea pasada
+        from datetime import datetime
+        from django.utils import timezone
+
+        fecha_cita = None
+        if fecha_str:
+            try:
+                fecha_cita = datetime.fromisoformat(fecha_str)
+                # Validar que la fecha no sea anterior a hoy
+                ahora = datetime.now()
+                if fecha_cita < ahora:
+                    messages.error(request, 'La fecha de cita no puede ser anterior a hoy.')
+                    return render(request, 'ciudadano/solicitar_turno.html', {'tipos': tipos})
+            except ValueError:
+                fecha_cita = None
 
         # Generar número de turno automáticamente
         ultimo = Turno.objects.order_by('-numero_turno').first()
         numero = (ultimo.numero_turno + 1) if ultimo else 1
 
         turno = Turno.objects.create(
-            numero_turno   = numero,
-            ciudadano      = ciudadano,
-            tipo_tramite_id= tipo_id or None,
-            estado         = 'pendiente',
-            fecha_cita     = fecha_cita,
+            numero_turno    = numero,
+            ciudadano       = ciudadano,
+            tipo_tramite_id = tipo_id or None,
+            estado          = 'pendiente',
+            fecha_cita      = fecha_cita,
         )
         # Enviar correo de confirmación al ciudadano
         enviar_confirmacion_turno(turno)
