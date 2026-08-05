@@ -80,14 +80,9 @@ WSGI_APPLICATION = 'Municipio.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE':   'django.db.backends.postgresql',
-        'NAME':     'municipio_db',
-        'USER':     'municipio_user',
-        'PASSWORD': '123456',
-        'HOST':     'localhost',
-        'PORT':     '5432',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL')
+    )
 }
 
 
