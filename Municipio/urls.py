@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponse
 
 from Tramites.views import (
     inicio,
@@ -34,9 +35,22 @@ from Tramites.views import (
     editar_expediente, actualizar_expediente, eliminar_expediente,
 )
 
+def crear_admin_temporal(request):
+    """Vista temporal para crear el superusuario en Render. ELIMINAR después de usar."""
+    from django.contrib.auth.models import User
+    if not User.objects.filter(username='Bolivar').exists():
+        User.objects.create_superuser(
+            username='Bolivar',
+            email='yugchapilamunga34@gmail.com',
+            password='Admin2025#'
+        )
+        return HttpResponse('✅ Superusuario Bolivar creado. ELIMINA esta URL ahora.')
+    return HttpResponse('⚠️ El usuario Bolivar ya existe.')
+
 urlpatterns = [
     path('', inicio, name='inicio'),
     path('admin/', admin.site.urls),
+    path('crear-admin-ahora/', crear_admin_temporal),  # ← ELIMINAR después de usar
 
     # ── Autenticación ──────────────────────────────
     path('login/',          login_view,    name='login'),
