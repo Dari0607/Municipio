@@ -138,11 +138,11 @@
 <script src="https://cdn.jsdelivr.net/npm/hotkeys-js@3.13.7/dist/hotkeys.min.js"></script>
 
 <script>
-  const CSRF = '{{ csrf_token }}';
+  const CSRF        = '{{ csrf_token }}';
   const ventanillaId = document.getElementById('btn-llamar').dataset.ventanilla;
 
   function llamarSiguiente() {
-    fetch('/llamar-siguiente/', {
+    fetch('{% url "llamar_siguiente" %}', {
       method: 'POST',
       headers: {
         'X-CSRFToken': CSRF,
@@ -150,23 +150,23 @@
       },
       body: `ventanilla_id=${ventanillaId}`
     })
-    .then(r => r.json())
+    .then(r => {
+      if (!r.ok) throw new Error('Error HTTP: ' + r.status);
+      return r.json();
+    })
     .then(data => {
       if (data.ok) {
-        // Actualizar el display principal
-        document.getElementById('numero-display').textContent  = '#' + data.numero_turno;
+        document.getElementById('numero-display').textContent   = '#' + data.numero_turno;
         document.getElementById('ciudadano-display').textContent = data.ciudadano;
         document.getElementById('tramite-display').textContent   = data.tramite;
 
-        // Quitar la fila del turno llamado de la cola
         const fila = document.getElementById('fila-' + data.turno_id);
         if (fila) fila.remove();
 
-        // Actualizar badge contador
         const filas = document.querySelectorAll('#tbody-cola tr');
-        document.getElementById('badge-cola').textContent = filas.length + ' esperando';
+        const badge = document.getElementById('badge-cola');
+        if (badge) badge.textContent = filas.length + ' esperando';
 
-        // Marcar el nuevo "siguiente" en la tabla
         const primera = document.querySelector('#tbody-cola tr');
         if (primera) {
           primera.style.background = '#e8f4fd';
@@ -177,7 +177,6 @@
           }
         }
 
-        // Flash de confirmación
         Swal.fire({
           toast: true, position: 'top-end', showConfirmButton: false,
           timer: 2500, icon: 'success',
@@ -188,16 +187,21 @@
         Swal.fire({
           toast: true, position: 'top-end', showConfirmButton: false,
           timer: 2500, icon: 'info',
-          title: data.mensaje || 'No hay más turnos.'
+          title: data.mensaje || 'No hay más turnos pendientes.'
         });
       }
+    })
+    .catch(err => {
+      Swal.fire({
+        toast: true, position: 'top-end', showConfirmButton: false,
+        timer: 3000, icon: 'error',
+        title: 'Error al llamar el turno: ' + err.message
+      });
     });
   }
 
-  // Botón click
   document.getElementById('btn-llamar').addEventListener('click', llamarSiguiente);
 
-  // Teclas Espacio y Enter con Hotkeys-js
   hotkeys('space, enter', function(e) {
     e.preventDefault();
     llamarSiguiente();
