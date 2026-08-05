@@ -391,8 +391,13 @@
 
 
   <!-- ══════════════ SCRIPTS ══════════════ -->
-  <!-- Vendor JS de Moderna (todos locales) -->
+  <!-- jQuery PRIMERO — todo lo demás depende de él -->
+  <script src="{% static 'assets/vendor/jquery/jquery.min.js' %}"></script>
+  <!-- SweetAlert2 — debe estar antes de confirmarEliminar -->
+  <script src="{% static 'assets/vendor/sweetalert2/sweetalert2.all.min.js' %}"></script>
+  <!-- Bootstrap JS -->
   <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- Vendor JS de Moderna -->
   <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
   <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
   <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
@@ -400,11 +405,8 @@
   <script src="{% static 'assets/vendor/waypoints/noframework.waypoints.js' %}"></script>
   <script src="{% static 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js' %}"></script>
   <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
-  <!-- JS principal de Moderna (inicializa AOS, swiper, carousel, scroll-top, etc.) -->
+  <!-- JS principal de Moderna -->
   <script src="{% static 'assets/js/main.js' %}"></script>
-
-  <!-- jQuery (necesario para DataTables y Validate) -->
-  <script src="{% static 'assets/vendor/jquery/jquery.min.js' %}"></script>
   <!-- DataTables -->
   <script src="{% static 'assets/vendor/datatables/jquery.dataTables.min.js' %}"></script>
   <script src="{% static 'assets/vendor/datatables/dataTables.bootstrap5.min.js' %}"></script>
@@ -412,8 +414,6 @@
   <script src="{% static 'assets/vendor/jquery-validation/jquery.validate.min.js' %}"></script>
   <!-- Validaciones personalizadas Municipio -->
   <script src="{% static 'assets/js/validaciones.js' %}"></script>
-  <!-- SweetAlert2 -->
-  <script src="{% static 'assets/vendor/sweetalert2/sweetalert2.all.min.js' %}"></script>
 
   <!-- Mensajes Django → SweetAlert2 -->
   {% if messages %}

@@ -693,11 +693,11 @@ def panel_funcionario(request):
 
     # Intentar obtener la ventanilla del funcionario logueado
     try:
-        funcionario = Funcionario.objects.get(
+        funcionario = Funcionario.objects.filter(
             email=request.user.email, activo=True
-        )
-        ventanilla = funcionario.ventanilla
-    except Funcionario.DoesNotExist:
+        ).first()
+        ventanilla = funcionario.ventanilla if funcionario else None
+    except Exception:
         funcionario = None
         ventanilla  = None
 
