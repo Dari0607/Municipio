@@ -8,6 +8,11 @@ from .models import (
     Departamento, Ventanilla, Funcionario,
     TipoTramite, Ciudadano, Turno, Expediente
 )
+from .utils_email import (
+    enviar_confirmacion_turno,
+    enviar_notificacion_llamado,
+    enviar_turno_resuelto,
+)
 
 
 # ─────────────────────────────────────────
@@ -471,6 +476,7 @@ def actualizar_turno(request, id):
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect('/')
     item = get_object_or_404(Turno, id=id)
+    estado_anterior = item.estado
     item.numero_turno    = request.POST['numero_turno']
     item.ciudadano_id    = request.POST['ciudadano']
     item.tipo_tramite_id = request.POST.get('tipo_tramite') or None
@@ -480,6 +486,14 @@ def actualizar_turno(request, id):
     item.fecha_cita      = request.POST.get('fecha_cita') or None
     item.observaciones   = request.POST.get('observaciones', '')
     item.save()
+
+    # Enviar correo si el turno pasó a resuelto
+    if estado_anterior != 'resuelto' and item.estado == 'resuelto':
+        from django.utils import timezone
+        item.fecha_resolucion = timezone.now()
+        item.save(update_fields=['fecha_resolucion'])
+        enviar_turno_resuelto(item)
+
     messages.success(request, 'Turno actualizado correctamente.')
     return redirect('/turnos/')
 
@@ -603,7 +617,9 @@ def solicitar_turno(request):
             estado         = 'pendiente',
             fecha_cita     = fecha_cita,
         )
-        messages.success(request, f'Tu turno fue creado con el número #{turno.numero_turno}.')
+        # Enviar correo de confirmación al ciudadano
+        enviar_confirmacion_turno(turno)
+        messages.success(request, f'Tu turno fue creado con el número #{turno.numero_turno}. Te enviamos una confirmación por correo.')
         return redirect('/mis-turnos/')
 
     return render(request, 'ciudadano/solicitar_turno.html', {'tipos': tipos})
@@ -727,11 +743,14 @@ def llamar_siguiente(request):
     ).order_by('fecha_solicitud').first()
 
     if siguiente:
-        siguiente.estado       = 'en_atencion'
+        siguiente.estado        = 'en_atencion'
         siguiente.fecha_llamado = timezone.now()
         if ventanilla_id:
             siguiente.ventanilla_id = ventanilla_id
         siguiente.save()
+
+        # Enviar notificación de llamado al ciudadano
+        enviar_notificacion_llamado(siguiente)
 
         return JsonResponse({
             'ok':           True,
