@@ -8,6 +8,15 @@
   <title>Municipio Digital — Atención Ciudadana</title>
   <meta name="description" content="Plataforma de Atención Ciudadana y Trámites Municipales">
 
+  <!-- PWA manifest -->
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <meta name="theme-color" content="#0077b6">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Municipio">
+  <link rel="apple-touch-icon" href="{% static 'assets/img/logo-municipio.svg' %}">
+
   <!-- Favicons -->
   <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
   <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
@@ -105,7 +114,10 @@
 
       <!-- Logo -->
       <a href="/" class="logo d-flex align-items-center">
-        <h1 class="sitename">Municipio<span style="color:#f0a500;">Digital</span></h1>
+        <img src="{% static 'assets/img/logo-municipio.svg' %}"
+             alt="Municipio Digital"
+             style="height:40px; width:40px; margin-right:10px; border-radius:50%;">
+        <h1 class="sitename">Municipio<span style="color:#ffd166;">Digital</span></h1>
       </a>
 
       <!-- Menú de navegación -->
@@ -450,6 +462,17 @@
   </script>
 
   {% block scripts %}{% endblock %}
+
+  <!-- Registro del Service Worker (PWA) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('{% static "sw.js" %}')
+          .then(reg => console.log('SW registrado:', reg.scope))
+          .catch(err => console.log('SW error:', err));
+      });
+    }
+  </script>
 
 </body>
 </html>

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+
+  <!-- Fondo circular azul -->
+  <circle cx="256" cy="256" r="256" fill="#0077b6"/>
+
+  <!-- Edificio principal (municipio) -->
+  <rect x="156" y="220" width="200" height="160" fill="#ffffff" rx="4"/>
+
+  <!-- Techo triangular / frontón clásico -->
+  <polygon points="136,220 256,130 376,220" fill="#ffd166"/>
+
+  <!-- Columnas del edificio -->
+  <rect x="176" y="230" width="18" height="150" fill="#cce7f5" rx="2"/>
+  <rect x="214" y="230" width="18" height="150" fill="#cce7f5" rx="2"/>
+  <rect x="280" y="230" width="18" height="150" fill="#cce7f5" rx="2"/>
+  <rect x="318" y="230" width="18" height="150" fill="#cce7f5" rx="2"/>
+
+  <!-- Puerta central -->
+  <rect x="232" y="300" width="48" height="80" fill="#0077b6" rx="4"/>
+  <!-- Arco de la puerta -->
+  <ellipse cx="256" cy="300" rx="24" ry="18" fill="#0077b6"/>
+
+  <!-- Ventanas superiores -->
+  <rect x="182" y="250" width="30" height="30" fill="#0077b6" rx="3"/>
+  <rect x="300" y="250" width="30" height="30" fill="#0077b6" rx="3"/>
+
+  <!-- Mástil de bandera -->
+  <rect x="250" y="90" width="4" height="42" fill="#ffd166"/>
+  <!-- Bandera -->
+  <rect x="254" y="90" width="28" height="18" fill="#ffd166" rx="2"/>
+
+  <!-- Base / escalones -->
+  <rect x="136" y="378" width="240" height="12" fill="#ffd166" rx="2"/>
+  <rect x="116" y="388" width="280" height="12" fill="#ffd166" rx="2"/>
+
+  <!-- Texto MUNICIPIO abajo -->
+  <text x="256" y="450"
+        font-family="Arial, sans-serif"
+        font-size="32"
+        font-weight="bold"
+        fill="#ffffff"
+        text-anchor="middle"
+        letter-spacing="3">MUNICIPIO</text>
+
+  <!-- Línea decorativa dorada -->
+  <rect x="156" y="458" width="200" height="3" fill="#ffd166" rx="2"/>
+
+</svg>

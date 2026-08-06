@@ -1,0 +1,42 @@
+{
+  "name": "Municipio Digital",
+  "short_name": "Municipio",
+  "description": "Plataforma de Atención Ciudadana y Trámites Municipales",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0077b6",
+  "theme_color": "#0077b6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/assets/img/logo-municipio.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/assets/img/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/assets/img/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Solicitar Turno",
+      "url": "/solicitar-turno/",
+      "description": "Reservar un turno"
+    },
+    {
+      "name": "Mis Turnos",
+      "url": "/mis-turnos/",
+      "description": "Ver mis turnos"
+    }
+  ]
+}
