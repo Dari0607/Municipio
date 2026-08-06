@@ -1,4 +1,4 @@
-const CACHE_NAME = 'municipio-v1';
+const CACHE_NAME = 'municipio-v2';
 const URLS_CACHE = [
   '/',
   '/login/',
